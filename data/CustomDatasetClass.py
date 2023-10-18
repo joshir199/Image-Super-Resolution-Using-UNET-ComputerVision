@@ -9,7 +9,7 @@ from scipy import ndimage, misc
 import matplotlib.pyplot as plt
 
 
-class ImageDatasetClass:
+class CustomDatasetClass:
 
     @staticmethod
     def unzip_dataset(zip_path, unzip_folder_path):
@@ -43,7 +43,7 @@ class ImageDatasetClass:
 
         img_data_list = []
         files = os.listdir(dataset_path)
-        files = ImageDatasetClass.sort_filenames(files)
+        files = CustomDatasetClass.sort_filenames(files)
 
         for index in tqdm(files):
             img = cv2.imread(dataset_path + '/' + index, 1)
