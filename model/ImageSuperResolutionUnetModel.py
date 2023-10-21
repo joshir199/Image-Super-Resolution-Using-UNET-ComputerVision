@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-class ImageSuperResolutionUnetModel:
+class ImageSuperResolutionUnetModel(tf.keras.Model):
 
     def __init__(self, SIZE, channels, isTraining=True):
         """
@@ -19,7 +19,7 @@ class ImageSuperResolutionUnetModel:
         self.output = tf.keras.layers.Conv2D(self.channels, kernel_size=(1, 1), padding='same',
                                              name='UNet model/output/Conv_out')
 
-    def build_model(self):
+    def call(self):
         """
         :return: returns UNET model
         """
@@ -42,30 +42,7 @@ class ImageSuperResolutionUnetModel:
         d5 = self.decoder_block(d4, 32, skip_1, 'decode_5')
 
         outputs = self.output(d5)
-        model = tf.keras.models.Model(input, outputs)
+
+        model = tf.keras.models.Model(inputs=[input], outputs=[outputs])
 
         return model
-
-    def conv_block(self, input_features, num_filters, block_name, model_name):
-        x = tf.keras.layers.Conv2D(num_filters, kernel_size=(3, 3), padding='same',
-                                   name=model_name + '/' + block_name + '/conv_1')(input_features)
-        x = tf.keras.layers.BatchNormalization(trainable=self.isTraining)(x)
-        x = tf.keras.layers.LeakyReLU()(x)
-
-        x = tf.keras.layers.Conv2D(num_filters, kernel_size=(3, 3), padding='same',
-                                   name=model_name + '/' + block_name + '/conv_1')(x)
-        x = tf.keras.layers.BatchNormalization(trainable=self.isTraining)(x)
-        x = tf.keras.layers.LeakyReLU()(x)
-        return x
-
-    def encoder_block(self, input_features, num_filters, block_name, model_name):
-        skip_layer = self.conv_block(input_features, num_filters, block_name, model_name)(input_features)
-        x = tf.keras.layers.MaxPool2D(pool_size=(2, 2))(skip_layer)
-        return skip_layer, x
-
-    def decoder_block(self, input_features, num_filters, skip_layer, block_name):
-        x = tf.keras.layers.Conv2DTranspose(num_filters, kernel_size=(2, 2), strides=(2, 2),
-                                            name=self.model_name + '/' + block_name + '/convTranspose_1')(input_features)
-        x = tf.keras.layers.Concatenate()([x, skip_layer])
-        x = tf.keras.layers.Dropout(0.3)(x)
-        return x
