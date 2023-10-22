@@ -4,12 +4,23 @@ import tensorflow as tf
 class ImageResolutionModel:
 
     def __init__(self, kernel_size, SIZE, channels, isTraining=True):
+        """
+        :param kernel_size: kernel size to be used for convolution
+        :param SIZE: Image size (w==h)
+        :param channels: channels of the image dataset
+        :param isTraining: to be enabled during training
+        """
         self.kernel_size = kernel_size
         self.SIZE = SIZE
         self.channels = channels
         self.isTraining = isTraining
 
     def conv_block(self, input_features, num_filters):
+        """
+        :param input_features: inputs
+        :param num_filters: number of kernel filters
+        :return: output of conv_block
+        """
         x = tf.keras.layers.Conv2D(num_filters, kernel_size=(self.kernel_size, self.kernel_size), padding='same')(
             input_features)
         x = tf.keras.layers.BatchNormalization(trainable=self.isTraining)(x)
@@ -21,17 +32,32 @@ class ImageResolutionModel:
         return x
 
     def encoder_block(self, input_features, num_filters):
+        """
+        :param input_features: inputs
+        :param num_filters: number of kernel filters
+        :return: output of encoder block
+        """
         skip = self.conv_block(input_features, num_filters)
         x = tf.keras.layers.MaxPool2D(pool_size=(2, 2))(skip)
         return skip, x
 
     def decoder_block(self, input_features, num_filters, skip_layer):
+        """
+        :param input_features: inputs
+        :param num_filters: number of kernel filters
+        :param skip_layer: residual layers from encoder block
+        :return: output of decoder block
+        """
         x = tf.keras.layers.Conv2DTranspose(num_filters, kernel_size=(2, 2), strides=(2, 2))(input_features)
         x = tf.keras.layers.Concatenate()([x, skip_layer])
         x = tf.keras.layers.Dropout(0.3)(x)
         return x
 
     def unet_model(self):
+        """
+        Unet Model
+        :return: unet model
+        """
 
         inputs = tf.keras.layers.Input((self.SIZE, self.SIZE, self.channels), name='unet_model')
 
