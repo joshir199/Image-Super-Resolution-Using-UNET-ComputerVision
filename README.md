@@ -19,3 +19,5 @@ To train the model with mlflow tracking context, run following command:
 ```bash
 python train.py
 ```
+
+Use Cases: Mobile Photography Quality Enhancement, Historical Image Enhancement, Medical Image Enhancement, Satellite Image Enhancement etc.
